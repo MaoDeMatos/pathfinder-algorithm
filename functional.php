@@ -2,90 +2,94 @@
 
 require_once 'autoload.php';
 
+echo "Start is RED - End is YELLOW - Blocked positions are GREY" . PHP_EOL . PHP_EOL;
+
 $map = json_decode(file_get_contents("./data.json"));
 
 $matrix = new Matrix();
-$matrix->setSize(12, 12)->setMap($map->simple);
+$matrix->setSize(6, 6)
+  // ->setMap($map->simple)
+  ->setInitialPos([2, 1])
+  ->setFinalPos([3, 4]);
 
-// $gen = new MatrixGenerator();
-// $matrix = $gen->fill($matrix);
+$gen = new MatrixGenerator();
+$matrix = $gen->fill($matrix);
 
 $matrix->display();
-
-$initial = ['x' => 2, 'y' => 2];
-$final = ['x' => 3, 'y' => 4];
 
 $steps = 0;
 
 print_r(
   findPath(
-    // $matrix,
+    $matrix,
     $matrix->getInitialPos(),
-    $final
+    $matrix->getFinalPos()
   )
 );
 
 function findPath(
-  // Matrix $map,
+  Matrix $matrix,
   array $initialPos,
   array $finalPos
 ) {
   global $steps;
-  $nextPos = $initialPos;
+  $directions = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ];
 
-  if ($initialPos == $finalPos) {
-    return PHP_EOL . "\033[92mEND\033[0m";
+  $map = $matrix->getMap();
+
+  $queue = is_array(
+    $initialPos[array_key_first($initialPos)]
+  ) ? $initialPos : [$initialPos];
+
+  // [$nextX, $nextY] = $initialPos;
+  [$finalX, $finalY] = $finalPos;
+
+  foreach ($queue as $k => [$currX, $currY]) {
+    // print_r($currX);
+    // echo " - ";
+    // print_r($currY);
+    // echo PHP_EOL;
+
+    // If Start or Finish positions are blocked paths
+    if ($map[$currX][$currY] == 0 || $map[$finalX][$finalY] == 0) {
+      return PHP_EOL . "\033[31mCANNOT STAND OR END ON A BLOCKED PATH\033[39m" . PHP_EOL . PHP_EOL;
+    }
+
+    // If at the end
+    if ([$currX, $currY] == [$finalX, $finalY]) {
+      return PHP_EOL
+        . "\033[92mEND\033[39m"
+        . PHP_EOL
+        . "Steps count : "
+        . $steps
+        . PHP_EOL;
+    } else {
+      $map[$currX][$currY] = 9;
+      $matrix->setMap($map);
+      // Debug
+      echo PHP_EOL;
+      $matrix->display();
+      // exit;
+
+      foreach ($directions as [$dX, $dY]) {
+        $nextX = $currX + $dX;
+        $nextY = $currY + $dY;
+
+        if (isset($map[$nextX][$nextY]) && $map[$nextX][$nextY] == 1) {
+          // echo PHP_EOL . "\033[92m[" . $nextX . ", " . $nextY . "]\033[39m";
+          unset($queue[$k]);
+
+          $queue[] = [$nextX, $nextY];
+        }
+      }
+      return findPath($matrix, $queue, $finalPos);
+    }
   }
-
-  if ($initialPos !== $finalPos) {
-    // print_r($initialPos);
-    // print_r($finalPos);
-
-    if (isBigger($initialPos["x"], $finalPos["x"])) {
-      $nextPos["x"] = $initialPos["x"] - 1;
-      $steps++;
-    } elseif (isBigger($finalPos["x"], $initialPos["x"])) {
-      $nextPos["x"] = $initialPos["x"] + 1;
-      $steps++;
-    }
-
-    if (isBigger($initialPos["y"], $finalPos["y"])) {
-      $nextPos["y"] = $initialPos["y"] - 1;
-      $steps++;
-    } elseif (isBigger($finalPos["y"], $initialPos["y"])) {
-      $nextPos["y"] = $initialPos["y"] + 1;
-      $steps++;
-    }
-
-    if (($nextPos["x"] || $nextPos['y']) == 0) {
-      return PHP_EOL . "Impossible de passer ";
-    }
-
-    print_r($nextPos);
-
-    findPath($nextPos, $finalPos);
-  }
-
-  return PHP_EOL . "Steps count : " . $steps;
 }
 
-/*
-function display($array) {
-  for ($i = 0; $i < count($array); $i++) {
-    for ($j = 0; $j < count($array[$i]); $j++) {
-      if (!$array[$i][$j]) {
-        echo "\033[31m " . $array[$i][$j] . "\033[0m";
-      } else echo " " . $array[$i][$j];
-    }
-    echo PHP_EOL;
-  }
-}
-*/
-
-function isBigger($a, $b) {
-  if ($a > $b) {
-    return true;
-  } else {
-    return false;
-  }
-}
+// $matrix->display();

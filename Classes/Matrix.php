@@ -8,10 +8,10 @@ class Matrix {
    */
   protected array $_map = [];
   // protected array $_nodeValues = [0, 1, 1];
-  protected array $_size = ['x' => 1, 'y' => 1];
+  protected array $_size = [1, 1];
 
-  protected array $_initialPos = ['x' => 1, 'y' => 1];
-  protected array $finalPos = ['x' => 1, 'y' => 1];
+  protected array $_initialPos = [1, 1];
+  protected array $_finalPos = [1, 1];
 
   public function getSize() {
     return $this->_size;
@@ -23,10 +23,13 @@ class Matrix {
    * @return self
    */
   public function setSize(int $x, int $y): self {
-    $this->_size['x'] = $x;
-    $this->_size['y'] = $y;
+    $this->_size = [$x, $y];
 
     return $this;
+  }
+
+  public function getMap() {
+    return $this->_map;
   }
 
   public function setMap(array $map): self {
@@ -35,8 +38,13 @@ class Matrix {
     return $this;
   }
 
-  public function getMap() {
-    return $this->_map;
+  public function getFinalPos() {
+    return $this->_finalPos;
+  }
+
+  public function setFinalPos(array $finalPos): self {
+    $this->_finalPos = $finalPos;
+    return $this;
   }
 
   public function getInitialPos() {
@@ -58,8 +66,12 @@ class Matrix {
 
     for ($i = 0; $i < count($map); $i++) {
       for ($j = 0; $j < count($map[$i]); $j++) {
-        if (!$map[$i][$j]) {
-          echo "\033[31m " . $map[$i][$j] . "\033[0m";
+        if ([$i, $j] == $this->_initialPos) {
+          echo "\033[31m " . $map[$i][$j] . "\033[39m";
+        } elseif ([$i, $j] == $this->_finalPos) {
+          echo "\033[33m " . $map[$i][$j] . "\033[39m";
+        } elseif ($map[$i][$j] == 0) {
+          echo "\033[90m " . $map[$i][$j] . "\033[39m";
         } else echo " " . $map[$i][$j];
       }
       echo PHP_EOL;
