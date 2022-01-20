@@ -61,7 +61,7 @@ function findPath(
       return PHP_EOL . "Impossible de passer ";
     }
 
-    print_r($nextPos);
+    // print_r($nextPos);
 
     findPath($nextPos, $finalPos);
   }
