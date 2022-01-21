@@ -9,12 +9,13 @@ class MatrixGenerator {
    */
   public function generate(Matrix $matrix): Matrix {
     [$sizeX, $sizeY] = $matrix->getSize();
+    $values = $matrix->getNodesValues();
 
     for ($i = 0; $i < $sizeY; $i++) {
       $map[] = [];
 
       for ($j = 0; $j < $sizeX; $j++) {
-        $map[$i][] = rand(0, 1);
+        $map[$i][] = $values[array_rand($values)];
       }
     }
     return $matrix->setMap($map);

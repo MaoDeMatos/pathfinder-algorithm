@@ -1,38 +1,44 @@
 <?php
 
-require_once 'autoload.php';
+require_once 'config.php';
 
-echo "Start is RED - End is YELLOW - Blocked positions are GREY" . PHP_EOL . PHP_EOL;
+echo PHP_EOL
+  . CONSOLE_GREEN . "Start is GREEN" . CONSOLE_DEFAULT_COLOR
+  . " - " . CONSOLE_YELLOW . "End is YELLOW" . CONSOLE_DEFAULT_COLOR
+  . " - " . CONSOLE_GREY . "Blocked positions are GREY" . CONSOLE_DEFAULT_COLOR . ""
+  . PHP_EOL;
 
-$map = json_decode(file_get_contents("./data.json"));
+echo "The algorithm can only go on 1s"
+  . PHP_EOL . "It cannot go on 0s"
+  . PHP_EOL . "It already went on 3s" . PHP_EOL;
 
+// Setting up the matrix
 $matrix = new Matrix();
-$matrix->setSize(6, 6)
-  // ->setMap($map->simple)
-  ->setInitialPos([2, 1])
-  ->setFinalPos([3, 4]);
+$file =
+  isset($argv[1]) && !empty($argv[1])
+  ? strval($argv[1])
+  : '';
 
-$gen = new MatrixGenerator();
-$matrix = $gen->fill($matrix);
+if ($file !== '') {
+  if ($temp = checkJsonFile($file, $matrix)) {
+    $matrix = $temp;
+    echo PHP_EOL . "MAP EXTRACTED FROM A JSON FILE" . PHP_EOL;
+  } else {
+    echo PHP_EOL . CONSOLE_RED . "INVALID FILE FORMAT"
+      . PHP_EOL . "(SEE THE README FILE)"
+      . CONSOLE_DEFAULT_COLOR . PHP_EOL;
+    exit;
+  }
+} else {
+  randomMatrix($matrix);
+}
+
+print_r(findPath($matrix, $matrix->getInitialPos(), $matrix->getFinalPos()));
 
 $matrix->display();
 
-$steps = 0;
-
-print_r(
-  findPath(
-    $matrix,
-    $matrix->getInitialPos(),
-    $matrix->getFinalPos()
-  )
-);
-
-function findPath(
-  Matrix $matrix,
-  array $initialPos,
-  array $finalPos
-) {
-  global $steps;
+// Main algorithm function
+function findPath(Matrix $matrix, array $initialPos, array $finalPos) {
   $directions = [
     [-1, 0],
     [1, 0],
@@ -41,55 +47,94 @@ function findPath(
   ];
 
   $map = $matrix->getMap();
+  $q = [[...$initialPos, 0, []]];
 
-  $queue = is_array(
-    $initialPos[array_key_first($initialPos)]
-  ) ? $initialPos : [$initialPos];
+  // If Start or Finish positions are blocked paths
+  if ($map[$initialPos[0]][$initialPos[1]] == 0 || $map[$finalPos[0]][$finalPos[1]] == 0) {
+    return BLOCKED_POS_STR;
+  } else {
+    $map[$initialPos[0]][$initialPos[1]] = 3;
+    $matrix->setMap($map);
+  }
 
-  // [$nextX, $nextY] = $initialPos;
-  [$finalX, $finalY] = $finalPos;
+  // While $q is not empty
+  while (count($q)) {
+    [$currX, $currY, $distance] = array_shift($q);
 
-  foreach ($queue as $k => [$currX, $currY]) {
-    // print_r($currX);
-    // echo " - ";
-    // print_r($currY);
-    // echo PHP_EOL;
+    // If at the end position
+    if ([$currX, $currY] == [$finalPos[0], $finalPos[1]]) {
+      $map[$currX][$currY] = 3;
+      $matrix->setMap($map);
 
-    // If Start or Finish positions are blocked paths
-    if ($map[$currX][$currY] == 0 || $map[$finalX][$finalY] == 0) {
-      return PHP_EOL . "\033[31mCANNOT STAND OR END ON A BLOCKED PATH\033[39m" . PHP_EOL . PHP_EOL;
+      return END_STR . DISTANCE_STR . " : " . $distance . PHP_EOL;
     }
 
-    // If at the end
-    if ([$currX, $currY] == [$finalX, $finalY]) {
-      return PHP_EOL
-        . "\033[92mEND\033[39m"
-        . PHP_EOL
-        . "Steps count : "
-        . $steps
-        . PHP_EOL;
-    } else {
-      $map[$currX][$currY] = 9;
-      $matrix->setMap($map);
-      // Debug
-      echo PHP_EOL;
-      $matrix->display();
-      // exit;
+    foreach ($directions as [$dX, $dY]) {
+      $nextX = $currX + $dX;
+      $nextY = $currY + $dY;
 
-      foreach ($directions as [$dX, $dY]) {
-        $nextX = $currX + $dX;
-        $nextY = $currY + $dY;
-
-        if (isset($map[$nextX][$nextY]) && $map[$nextX][$nextY] == 1) {
-          // echo PHP_EOL . "\033[92m[" . $nextX . ", " . $nextY . "]\033[39m";
-          unset($queue[$k]);
-
-          $queue[] = [$nextX, $nextY];
-        }
+      // If navigable position
+      if (
+        isset($map[$nextX][$nextY])
+        && !empty($map[$nextX][$nextY])
+        && $map[$nextX][$nextY] == 1
+      ) {
+        $map[$nextX][$nextY] = 3;
+        $matrix->setMap($map);
+        $q[] = [$nextX, $nextY, $distance + 1];
       }
-      return findPath($matrix, $queue, $finalPos);
     }
   }
+  return PHP_EOL
+    . CONSOLE_RED . "COULD NOT FIND A WAY TO THE END" . CONSOLE_DEFAULT_COLOR
+    . PHP_EOL . PHP_EOL;
 }
 
-// $matrix->display();
+function checkJsonFile(string $file, Matrix $matrix): ?Matrix {
+  if (isset($file) && !empty($file)) {
+    $map = json_decode(file_get_contents($file), true);
+    $map = $map[array_key_first($map)];
+
+    $chars = [];
+
+    // Find the start and the end of the path in the JSON file
+    for ($i = 0; $i < count($map); $i++) {
+      for ($j = 0; $j < count($map[$i]); $j++) {
+        $chars[] = strtolower($map[$i][$j]);
+        switch (strtolower($map[$i][$j])) {
+          case 's':
+            $matrix->setInitialPos([$i, $j]);
+            $map[$i][$j] = 1;
+            break;
+
+          case 'e':
+            $matrix->setFinalPos([$i, $j]);
+            $map[$i][$j] = 1;
+            break;
+
+          default:
+            break;
+        }
+      }
+    }
+
+    if (array_search("s", $chars) && array_search("e", $chars)) {
+      // Fill the matrix with the JSON file content
+      return $matrix->setMap($map);
+    }
+  }
+  return null;
+}
+
+function randomMatrix($matrix): Matrix {
+  $x = 12;
+  $y = 10;
+  $matrix->setSize($x, $y)
+    ->setInitialPos([rand(0, $y - 1), rand(0, $x - 1)])
+    ->setFinalPos([rand(0, $y - 1), rand(0, $x - 1)]);
+
+  echo PHP_EOL . "MAP GENERATED RANDOMLY" . PHP_EOL;
+
+  $gen = new MatrixGenerator();
+  return $gen->generate($matrix);
+}
