@@ -6,12 +6,23 @@ class Matrix {
    *
    * @var array
    */
-  protected array $_map = [];
-  // protected array $_nodeValues = [0, 1, 1];
-  protected array $_size = ['x' => 1, 'y' => 1];
+  protected array $_map;
+  protected array $_nodesValues = [0, 1, 1, 1];
+  protected array $_size = [4, 4];
 
-  protected array $_initialPos = ['x' => 1, 'y' => 1];
-  protected array $finalPos = ['x' => 1, 'y' => 1];
+  protected array $_initialPos = [1, 1];
+  protected array $_finalPos = [1, 1];
+  protected array $_shortestPath = [];
+
+  public function getNodesValues() {
+    return $this->_nodesValues;
+  }
+
+  public function setNodesValues(array $nodesValues): self {
+    $this->_nodesValues = $nodesValues;
+
+    return $this;
+  }
 
   public function getSize() {
     return $this->_size;
@@ -23,10 +34,13 @@ class Matrix {
    * @return self
    */
   public function setSize(int $x, int $y): self {
-    $this->_size['x'] = $x;
-    $this->_size['y'] = $y;
+    $this->_size = [$x, $y];
 
     return $this;
+  }
+
+  public function getMap() {
+    return $this->_map;
   }
 
   public function setMap(array $map): self {
@@ -35,8 +49,13 @@ class Matrix {
     return $this;
   }
 
-  public function getMap() {
-    return $this->_map;
+  public function getFinalPos() {
+    return $this->_finalPos;
+  }
+
+  public function setFinalPos(array $finalPos): self {
+    $this->_finalPos = $finalPos;
+    return $this;
   }
 
   public function getInitialPos() {
@@ -56,13 +75,28 @@ class Matrix {
   public function display() {
     $map = $this->getMap();
 
+    // Create the separator and add it to the start of the grid
+    $space = '  ';
+    $hr = substr($space, -1);
+
+    for ($i = 0; $i < count($map[0]); $i++) {
+      $hr = $hr . '---';
+    }
+    $grid = $hr . PHP_EOL;
+
+    // Add the values and their color to the grid
     for ($i = 0; $i < count($map); $i++) {
       for ($j = 0; $j < count($map[$i]); $j++) {
-        if (!$map[$i][$j]) {
-          echo "\033[31m " . $map[$i][$j] . "\033[0m";
-        } else echo " " . $map[$i][$j];
+        if ([$i, $j] == $this->_initialPos) {
+          $grid = $grid . CONSOLE_GREEN . $space . $map[$i][$j] . CONSOLE_DEFAULT_COLOR;
+        } elseif ([$i, $j] == $this->_finalPos) {
+          $grid = $grid . CONSOLE_YELLOW . $space . $map[$i][$j] . CONSOLE_DEFAULT_COLOR;
+        } elseif ($map[$i][$j] == 0) {
+          $grid = $grid . CONSOLE_GREY . $space . $map[$i][$j] . CONSOLE_DEFAULT_COLOR;
+        } else $grid = $grid . $space . $map[$i][$j];
       }
-      echo PHP_EOL;
+      $grid = $grid . PHP_EOL;
     }
+    echo $grid . PHP_EOL;
   }
 }

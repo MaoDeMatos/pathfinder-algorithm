@@ -8,13 +8,14 @@ class MatrixGenerator {
    * @return Matrix
    */
   public function generate(Matrix $matrix): Matrix {
-    $size = $matrix->getSize();
+    [$sizeX, $sizeY] = $matrix->getSize();
+    $values = $matrix->getNodesValues();
 
-    for ($i = 0; $i < $size['y']; $i++) {
-      $map[$i] = [];
+    for ($i = 0; $i < $sizeY; $i++) {
+      $map[] = [];
 
-      for ($j = 0; $j < $size['x']; $j++) {
-        $map[$i][] = rand(0, 1);
+      for ($j = 0; $j < $sizeX; $j++) {
+        $map[$i][] = $values[array_rand($values)];
       }
     }
     return $matrix->setMap($map);
@@ -27,12 +28,12 @@ class MatrixGenerator {
    * @return Matrix
    */
   public function fill(Matrix $matrix): Matrix {
-    $size = $matrix->getSize();
+    [$sizeX, $sizeY] = $matrix->getSize();
 
-    for ($i = 0; $i < $size['y']; $i++) {
-      $map[$i] = [];
+    for ($i = 0; $i < $sizeY; $i++) {
+      $map[] = [];
 
-      for ($j = 0; $j < $size['x']; $j++) {
+      for ($j = 0; $j < $sizeX; $j++) {
         $map[$i][] = 1;
       }
     }

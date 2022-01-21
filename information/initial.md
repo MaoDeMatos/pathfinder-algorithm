@@ -2,9 +2,12 @@
 
 The algorithm must :
 
-1. Find a path to go from A to B
-2. Use a map (2 dimensional array)
-3. Output number of steps
-4. Avoid obstacles
-5. Output map with chosen path
-6. Find the ***shortest*** path to go from A to B
+- [x] Find a path to go from A to B
+- [x] Use a map (2 dimensional array)
+- [x] Avoid obstacles
+- [x] Find the ***shortest*** path to go from A to B
+- [x] Output number of steps
+
+I searched for the different existing algorithms and tried to understand their basic functioning.
+
+Then, make a simple one myself, finding a path from A to B, without taking into account obstacles, and add more conditions to it.
