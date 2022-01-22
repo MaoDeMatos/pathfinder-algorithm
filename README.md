@@ -34,6 +34,13 @@ I was tempted to go for A Star because my movement system was a bit closer to it
 
 ## How to use
 
+If you want to generate a random map :
+
+```sh
+# Simply don't use any arguments
+php functional.php
+```
+
 If you want to use a JSON file :
 
 ```sh
@@ -46,20 +53,13 @@ php functional.php {JSON file path}
 php functional.php ./data/example.json
 ```
 
-If you want to generate a random map :
-
-```sh
-# Simply don't use any arguments
-php functional.php
-```
-
 ## JSON File format
 
 The JSON files provided must be structured as following :
 
 ```json
 {
-  "0": [
+  "example": [
     [1, 1, 1, 1, 1],
     ["e", 1, 0, 0, 1],
     [0, 1, 1, 0, 1],
@@ -71,9 +71,11 @@ The JSON files provided must be structured as following :
 ```
 
 ```sh
-IT WILL ONLY TAKE THE FIRST ELEMENT IN ACCOUNT
-```
+IF THERE ARE MULTIPLE GRIDS IN THE FILE, IT WILL ONLY TAKE THE FIRST ELEMENT
 
-```sh
-YOU MUST HAVE A "E" AND A "S" IN THE ARRAY OR IT WILL DISPLAY AN "INVALID FILE FORMAT" ERROR
+YOU MUST HAVE A "S" (START) AND A "E" (END) IN THE ARRAY OR IT WILL DISPLAY AN "INVALID FILE FORMAT" ERROR
+
+IF THERE ARE MULTIPLE STARTS OR ENDS, ONLY THE LAST ONE OF EACH WILL BE USED
+
+IT WILL ONLY STOP ON 0s, NON RECOGNIZED CHARS/NUMBERS WILL BE TURNED INTO 1s
 ```

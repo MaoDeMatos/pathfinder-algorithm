@@ -1,9 +1,10 @@
 <?php
 
-require_once 'config.php';
+require_once './config.php';
 
 echo PHP_EOL
-  . CONSOLE_GREEN . "Start is GREEN" . CONSOLE_DEFAULT_COLOR
+  . CONSOLE_BLUE . "Start is BLUE" . CONSOLE_DEFAULT_COLOR
+  . " - " . CONSOLE_GREEN . "Path is GREEN" . CONSOLE_DEFAULT_COLOR . PHP_EOL
   . " - " . CONSOLE_YELLOW . "End is YELLOW" . CONSOLE_DEFAULT_COLOR
   . " - " . CONSOLE_GREY . "Blocked positions are GREY" . CONSOLE_DEFAULT_COLOR . ""
   . PHP_EOL;
@@ -33,8 +34,14 @@ if ($file !== '') {
   randomMatrix($matrix);
 }
 
-print_r(findPath($matrix, $matrix->getInitialPos(), $matrix->getFinalPos()));
+// Execute
+printf("%s", findPath(
+  $matrix,
+  $matrix->getInitialPos(),
+  $matrix->getFinalPos()
+));
 
+// Display final map, with shortest path and positions checked
 $matrix->display();
 
 // Main algorithm function
@@ -47,7 +54,12 @@ function findPath(Matrix $matrix, array $initialPos, array $finalPos) {
   ];
 
   $map = $matrix->getMap();
-  $q = [[...$initialPos, 0, []]];
+  // Set the first element in queue :
+  // We store its coordinates and the list of parent nodes
+  // (Empty array for the starting node)
+  $q = [
+    [$initialPos, []]
+  ];
 
   // If Start or Finish positions are blocked paths
   if ($map[$initialPos[0]][$initialPos[1]] == 0 || $map[$finalPos[0]][$finalPos[1]] == 0) {
@@ -59,15 +71,19 @@ function findPath(Matrix $matrix, array $initialPos, array $finalPos) {
 
   // While $q is not empty
   while (count($q)) {
-    [$currX, $currY, $distance] = array_shift($q);
+    [$position, $path] = array_shift($q);
+    [$currX, $currY] = $position;
 
     // If at the end position
     if ([$currX, $currY] == [$finalPos[0], $finalPos[1]]) {
       $map[$currX][$currY] = 3;
-      $matrix->setMap($map);
+      $matrix->setMap($map)
+        ->setShortestPath($path);
 
-      return END_STR . DISTANCE_STR . " : " . $distance . PHP_EOL;
+      return END_STR . DISTANCE_STR . " : " . count($path) . PHP_EOL;
     }
+
+    $path[] = [$currX, $currY];
 
     foreach ($directions as [$dX, $dY]) {
       $nextX = $currX + $dX;
@@ -81,7 +97,10 @@ function findPath(Matrix $matrix, array $initialPos, array $finalPos) {
       ) {
         $map[$nextX][$nextY] = 3;
         $matrix->setMap($map);
-        $q[] = [$nextX, $nextY, $distance + 1];
+
+        $nextPosition = [$nextX, $nextY];
+
+        $q[] = [$nextPosition, $path];
       }
     }
   }
@@ -91,17 +110,23 @@ function findPath(Matrix $matrix, array $initialPos, array $finalPos) {
 }
 
 function checkJsonFile(string $file, Matrix $matrix): ?Matrix {
-  if (isset($file) && !empty($file)) {
-    $map = json_decode(file_get_contents($file), true);
-    $map = $map[array_key_first($map)];
+  $data =
+    isset($file) && !empty($file)
+    ? file_get_contents($file) ?? file_get_contents($file)
+    : null;
 
-    $chars = [];
+  $map = $data ? json_decode($data, true) : null;
+  $map = $map ? $map[array_key_first($map)] : null;
 
+  $chars = [];
+
+  if ($map) {
     // Find the start and the end of the path in the JSON file
     for ($i = 0; $i < count($map); $i++) {
       for ($j = 0; $j < count($map[$i]); $j++) {
-        $chars[] = strtolower($map[$i][$j]);
-        switch (strtolower($map[$i][$j])) {
+        $val = strtolower($map[$i][$j]);
+        $chars[] = $val;
+        switch ($val) {
           case 's':
             $matrix->setInitialPos([$i, $j]);
             $map[$i][$j] = 1;
@@ -117,11 +142,10 @@ function checkJsonFile(string $file, Matrix $matrix): ?Matrix {
         }
       }
     }
-
-    if (array_search("s", $chars) && array_search("e", $chars)) {
-      // Fill the matrix with the JSON file content
-      return $matrix->setMap($map);
-    }
+  }
+  if (array_search("s", $chars) && array_search("e", $chars)) {
+    // Fill the matrix with the JSON file content
+    return $matrix->setMap($map);
   }
   return null;
 }

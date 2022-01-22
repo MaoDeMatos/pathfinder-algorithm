@@ -14,6 +14,16 @@ class Matrix {
   protected array $_finalPos = [1, 1];
   protected array $_shortestPath = [];
 
+  public function getMap() {
+    return $this->_map;
+  }
+
+  public function setMap(array $map): self {
+    $this->_map = $map;
+
+    return $this;
+  }
+
   public function getNodesValues() {
     return $this->_nodesValues;
   }
@@ -39,13 +49,12 @@ class Matrix {
     return $this;
   }
 
-  public function getMap() {
-    return $this->_map;
+  public function getInitialPos() {
+    return $this->_initialPos;
   }
 
-  public function setMap(array $map): self {
-    $this->_map = $map;
-
+  public function setInitialPos(array $initialPos): self {
+    $this->_initialPos = $initialPos;
     return $this;
   }
 
@@ -58,12 +67,12 @@ class Matrix {
     return $this;
   }
 
-  public function getInitialPos() {
-    return $this->_initialPos;
+  public function getShortestPath() {
+    return $this->_shortestPath;
   }
 
-  public function setInitialPos(array $initialPos): self {
-    $this->_initialPos = $initialPos;
+  public function setShortestPath(array $shortestPath): self {
+    $this->_shortestPath = $shortestPath;
     return $this;
   }
 
@@ -84,10 +93,12 @@ class Matrix {
     }
     $grid = $hr . PHP_EOL;
 
-    // Add the values and their color to the grid
+    // Add the colored values to the grid
     for ($i = 0; $i < count($map); $i++) {
       for ($j = 0; $j < count($map[$i]); $j++) {
         if ([$i, $j] == $this->_initialPos) {
+          $grid = $grid . CONSOLE_BLUE . $space . $map[$i][$j] . CONSOLE_DEFAULT_COLOR;
+        } elseif ($this->searchForPositions($this->_shortestPath, [$i, $j])) {
           $grid = $grid . CONSOLE_GREEN . $space . $map[$i][$j] . CONSOLE_DEFAULT_COLOR;
         } elseif ([$i, $j] == $this->_finalPos) {
           $grid = $grid . CONSOLE_YELLOW . $space . $map[$i][$j] . CONSOLE_DEFAULT_COLOR;
@@ -98,5 +109,14 @@ class Matrix {
       $grid = $grid . PHP_EOL;
     }
     echo $grid . PHP_EOL;
+  }
+
+  private function searchForPositions($haystack, $needle): ?int {
+    foreach ($haystack as $key => $val) {
+      if ($val === $needle) {
+        return $key;
+      }
+    }
+    return null;
   }
 }

@@ -1,8 +1,13 @@
 <?php
 
+// Error reporting off
+// Avoid displaying PHP messages if a JSON is not readable
+error_reporting(0);
+
 // Base display
 define("CONSOLE_RED", "\033[31m");
 define("CONSOLE_YELLOW", "\033[33m");
+define("CONSOLE_BLUE", "\033[34m");
 define("CONSOLE_GREY", "\033[90m");
 define("CONSOLE_GREEN", "\033[92m");
 define("CONSOLE_DEFAULT_COLOR", "\033[39m");
