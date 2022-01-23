@@ -43,7 +43,8 @@ printf("%s", findPath(
 ));
 
 // Display final map, with shortest path and positions checked
-$matrix->display();
+$display = new Display();
+$display->displayMap($matrix);
 
 // Main algorithm function
 function findPath(Matrix $matrix, array $initialPos, array $finalPos) {
