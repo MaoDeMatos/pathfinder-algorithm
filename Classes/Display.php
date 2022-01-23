@@ -27,13 +27,13 @@ class Display implements IDisplay {
     for ($i = 0; $i < count($map); $i++) {
       for ($j = 0; $j < count($map[$i]); $j++) {
         // Color of the start position
-        if ([$i, $j] == $this->_initialPos) {
+        if ([$i, $j] == $matrix->getInitialPos()) {
           $grid = $grid . CONSOLE_BLUE . $space . $map[$i][$j] . CONSOLE_DEFAULT_COLOR;
           // Color of the shortest path
-        } elseif ($this->searchForPositions($this->_shortestPath, [$i, $j])) {
+        } elseif ($this->searchForPositions($matrix->getShortestPath(), [$i, $j])) {
           $grid = $grid . CONSOLE_GREEN . $space . $map[$i][$j] . CONSOLE_DEFAULT_COLOR;
           // Color of the final position
-        } elseif ([$i, $j] == $this->_finalPos) {
+        } elseif ([$i, $j] == $matrix->getFinalPos()) {
           $grid = $grid . CONSOLE_YELLOW . $space . $map[$i][$j] . CONSOLE_DEFAULT_COLOR;
           // Color of the blocked positiosns
         } elseif ($map[$i][$j] == 0) {
