@@ -21,7 +21,7 @@ $file =
   : '';
 
 if ($file !== '') {
-  if ($temp = checkJsonFile($file, $matrix)) {
+  if ($temp = checkJsonFile($matrix, $file)) {
     $matrix = $temp;
     echo PHP_EOL . "MAP EXTRACTED FROM A JSON FILE" . PHP_EOL;
   } else {
@@ -31,7 +31,8 @@ if ($file !== '') {
     exit;
   }
 } else {
-  randomMatrix($matrix);
+  $gen = new MatrixGenerator();
+  $matrix = $gen->randomMatrix($matrix);
 }
 
 // Execute
@@ -109,14 +110,11 @@ function findPath(Matrix $matrix, array $initialPos, array $finalPos) {
     . PHP_EOL . PHP_EOL;
 }
 
-function checkJsonFile(string $file, Matrix $matrix): ?Matrix {
-  $data =
-    isset($file) && !empty($file)
-    ? file_get_contents($file) ?? file_get_contents($file)
-    : null;
+function checkJsonFile(Matrix $matrix, string $file): ?Matrix {
+  $data = file_get_contents($file) ?? null;
 
   $map = $data ? json_decode($data, true) : null;
-  $map = $map ? $map[array_key_first($map)] : null;
+  $map = $map[array_key_first($map)] ?? null;
 
   $chars = [];
 
@@ -148,17 +146,4 @@ function checkJsonFile(string $file, Matrix $matrix): ?Matrix {
     return $matrix->setMap($map);
   }
   return null;
-}
-
-function randomMatrix($matrix): Matrix {
-  $x = 12;
-  $y = 10;
-  $matrix->setSize($x, $y)
-    ->setInitialPos([rand(0, $y - 1), rand(0, $x - 1)])
-    ->setFinalPos([rand(0, $y - 1), rand(0, $x - 1)]);
-
-  echo PHP_EOL . "MAP GENERATED RANDOMLY" . PHP_EOL;
-
-  $gen = new MatrixGenerator();
-  return $gen->generate($matrix);
 }

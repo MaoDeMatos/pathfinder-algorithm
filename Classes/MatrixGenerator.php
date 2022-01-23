@@ -39,4 +39,22 @@ class MatrixGenerator {
     }
     return $matrix->setMap($map);
   }
+
+  /**
+   * Generate a fully randomized matrix (with random starting and ending points)
+   *
+   * @param Matrix $matrix
+   * @return Matrix
+   */
+  public function randomMatrix(Matrix $matrix): Matrix {
+    $x = 12;
+    $y = 10;
+    $matrix->setSize($x, $y)
+      ->setInitialPos([rand(0, $y - 1), rand(0, $x - 1)])
+      ->setFinalPos([rand(0, $y - 1), rand(0, $x - 1)]);
+
+    echo PHP_EOL . "MAP GENERATED RANDOMLY" . PHP_EOL;
+
+    return $this->generate($matrix);
+  }
 }

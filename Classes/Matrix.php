@@ -88,23 +88,34 @@ class Matrix {
     $space = '  ';
     $hr = substr($space, -1);
 
-    for ($i = 0; $i < count($map[0]); $i++) {
+    $longestRow = 0;
+    foreach ($map as $row) {
+      $longestRow = $longestRow < count($row) ? count($row) : $longestRow;
+    }
+    for ($i = 0; $i < $longestRow; $i++) {
       $hr = $hr . '---';
     }
     $grid = $hr . PHP_EOL;
 
-    // Add the colored values to the grid
     for ($i = 0; $i < count($map); $i++) {
       for ($j = 0; $j < count($map[$i]); $j++) {
+        // Color of the start position
         if ([$i, $j] == $this->_initialPos) {
           $grid = $grid . CONSOLE_BLUE . $space . $map[$i][$j] . CONSOLE_DEFAULT_COLOR;
+          // Color of the shortest path
         } elseif ($this->searchForPositions($this->_shortestPath, [$i, $j])) {
           $grid = $grid . CONSOLE_GREEN . $space . $map[$i][$j] . CONSOLE_DEFAULT_COLOR;
+          // Color of the final position
         } elseif ([$i, $j] == $this->_finalPos) {
           $grid = $grid . CONSOLE_YELLOW . $space . $map[$i][$j] . CONSOLE_DEFAULT_COLOR;
+          // Color of the blocked positiosns
         } elseif ($map[$i][$j] == 0) {
           $grid = $grid . CONSOLE_GREY . $space . $map[$i][$j] . CONSOLE_DEFAULT_COLOR;
-        } else $grid = $grid . $space . $map[$i][$j];
+          // Spaces
+        } elseif ($map[$i][$j] == "") {
+          $grid = $grid . $space . ' ';
+        } else $grid = $grid . $space . substr($map[$i][$j], 0, 1);
+        // substr used to prevent a cell with multiple chars to break the display
       }
       $grid = $grid . PHP_EOL;
     }

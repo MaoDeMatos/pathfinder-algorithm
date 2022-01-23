@@ -34,17 +34,19 @@ I was tempted to go for A Star because my movement system was a bit closer to it
 
 ## How to use
 
+```sh
+# Execute commands in the project root dir
+```
+
 If you want to generate a random map :
 
 ```sh
-# Simply don't use any arguments
 php functional.php
 ```
 
 If you want to use a JSON file :
 
 ```sh
-# In the root dir
 php functional.php {JSON file path}
 ```
 
@@ -54,6 +56,14 @@ php functional.php ./data/example.json
 ```
 
 ## JSON File format
+
+If there are multiple grids in the file, il will only take the first element.
+
+You must have a "S" (start) and a "e" (end) in the array of it will display an "invalid file format" error.
+
+If there are multiple starts or end, only the last one of each will be used.
+
+It will stop on 0s, empty cells or non recognized chars/numbers.
 
 The JSON files provided must be structured as following :
 
@@ -70,12 +80,27 @@ The JSON files provided must be structured as following :
 }
 ```
 
-```sh
-IF THERE ARE MULTIPLE GRIDS IN THE FILE, IT WILL ONLY TAKE THE FIRST ELEMENT
+You can use any 2D array, even with different line sizes and empty lines or cells.
 
-YOU MUST HAVE A "S" (START) AND A "E" (END) IN THE ARRAY OR IT WILL DISPLAY AN "INVALID FILE FORMAT" ERROR
-
-IF THERE ARE MULTIPLE STARTS OR ENDS, ONLY THE LAST ONE OF EACH WILL BE USED
-
-IT WILL ONLY STOP ON 0s, NON RECOGNIZED CHARS/NUMBERS WILL BE TURNED INTO 1s
+```json
+{
+  "non_rectangle": [
+    [1, 1, 0, 1, 1],
+    [],
+    [0, 1, 1, 0, 1, 1],
+    [1, 1, 0, 1, 1, 0, 1, 1],
+    [1, "s", 0, "", 0, 1, 1],
+    [0, 1, 0, 1, 1, 1],
+    [1, 1, 1, 1, "", 1, 1, 0],
+    ["", 1, "", 1, "", 1],
+    [1, 1, 0, 1, 0, "e", 1],
+    ["", "", "", "", "", 1]
+  ]
+}
 ```
+
+## Caveats
+
+It seems the algorithm empties the queue even if the final point is found :
+
+In some cases, positions after the end are still checked.
