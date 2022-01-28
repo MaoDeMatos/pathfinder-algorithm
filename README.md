@@ -59,7 +59,7 @@ php functional.php ./data/example.json
 
 If there are multiple grids in the file, il will only take the first element.
 
-You must have a "S" (start) and a "e" (end) in the array of it will display an "invalid file format" error.
+You must have a "s" (start) and a "e" (end) (case insensitive) in the array of it will display an "invalid file format" error.
 
 If there are multiple starts or end, only the last one of each will be used.
 
