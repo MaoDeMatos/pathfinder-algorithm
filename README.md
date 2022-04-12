@@ -34,9 +34,7 @@ I was tempted to go for A Star because my movement system was a bit closer to it
 
 ## How to use
 
-```sh
-# Execute commands in the project root dir
-```
+❗ Execute commands in the project root dir.
 
 If you want to generate a random map :
 
@@ -48,9 +46,7 @@ If you want to use a JSON file :
 
 ```sh
 php functional.php {JSON file path}
-```
 
-```sh
 # Example
 php functional.php ./data/example.json
 ```
