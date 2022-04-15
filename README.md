@@ -1,5 +1,7 @@
 # Pathfinder algorithm
 
+Studying project.
+
 [Initial approach](./information/initial.md)
 
 ## Goal
@@ -8,8 +10,8 @@ Make a pathfinder algorithm capable of using a 2D array as a map to find the sho
 
 It must :
 
-- Travel **only up/down** and **left/right**, *no diagonals allowed*
-- Travel through ***1***s and avoid ***0***s
+- Travel **only up/down** and **left/right**, _no diagonals allowed_
+- Travel through **_1_**s and avoid **_0_**s
 - Return the distance of the shortest path
 - Return the map with the path displayed
 - Return an error message if there are no paths, invalid data is provided, etc...
