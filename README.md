@@ -36,9 +36,7 @@ I was tempted to go for A Star because my movement system was a bit closer to it
 
 ## How to use
 
-```sh
-# Execute commands in the project root dir
-```
+❗ Execute commands in the project root dir.
 
 If you want to generate a random map :
 
@@ -50,9 +48,7 @@ If you want to use a JSON file :
 
 ```sh
 php functional.php {JSON file path}
-```
 
-```sh
 # Example
 php functional.php ./data/example.json
 ```
@@ -61,7 +57,7 @@ php functional.php ./data/example.json
 
 If there are multiple grids in the file, il will only take the first element.
 
-You must have a "S" (start) and a "e" (end) in the array of it will display an "invalid file format" error.
+You must have a "s" (start) and a "e" (end) (case insensitive) in the array of it will display an "invalid file format" error.
 
 If there are multiple starts or end, only the last one of each will be used.
 
